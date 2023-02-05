@@ -1,0 +1,40 @@
+version: '3' 
+services:
+  mqttbroker:
+    container_name: "mosquitto"
+    image: eclipse-mosquitto:latest
+    networks:
+      - node-red-net
+    ports:
+      - "1883:1883"
+    restart: always
+    volumes:
+      - mosquitto_data:/mosquitto/data 
+      - mosquitto_config:/mosquitto/config
+      - mosquitto_log:/mosquitto/log
+    environment:
+      - TZ=Europe/Budapest
+
+  nodered:
+    container_name: "nodered"
+    image: nodered/node-red:latest
+    networks:
+      - node-red-net
+    ports:
+      - "1880:1880"
+    volumes:
+      - nodered:/data    
+    depends_on:
+      - mqttbroker
+    environment:
+      - TZ=Europe/Budapest    
+    restart: unless-stopped
+
+volumes:
+  mosquitto_data:
+  mosquitto_config:
+  mosquitto_log:
+  nodered:
+
+networks:
+  node-red-net:
